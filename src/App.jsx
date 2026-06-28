@@ -8,6 +8,7 @@ import { ToastProvider } from './components/Toast';
 import { ThemeProvider, ThemeToggle } from './components/DarkMode';
 import KeyboardShortcuts from './components/KeyboardShortcuts';
 import { CompareProvider, CompareBar } from './components/CompareBar';
+import ChatBot from './components/ChatBot';
 import HomePage from './pages/HomePage';
 import ProductPage from './pages/ProductPage';
 import CartPage from './pages/CartPage';
@@ -44,6 +45,7 @@ function Layout() {
       <ThemeToggle />
       <KeyboardShortcuts />
       <CompareBar />
+      <ChatBot />
     </>
   );
 }
