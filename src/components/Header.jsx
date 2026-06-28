@@ -63,7 +63,7 @@ export default function Header() {
 
           {/* Search */}
           <form onSubmit={handleSearch} className="flex-1 flex h-10">
-            <select className="h-full bg-gray-100 text-gray-700 text-xs px-2 rounded-l-md border-r border-gray-300 focus:outline-none hidden sm:block">
+            <select className="h-full bg-white text-gray-700 text-xs px-2 rounded-l-md border-r border-gray-300 focus:outline-none hidden sm:block">
               <option>All</option>
               <option>Electronics</option>
               <option>Books</option>
@@ -78,7 +78,7 @@ export default function Header() {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search Scamazon"
-              className="flex-1 px-4 text-black text-sm focus:outline-none"
+              className="flex-1 px-4 bg-white text-black text-sm focus:outline-none"
             />
             <button
               type="submit"

@@ -5,28 +5,33 @@ import { useUserStore } from '../store/useStore';
 export default function SignInPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [localError, setLocalError] = useState('');
   const signIn = useUserStore(s => s.signIn);
+  const loading = useUserStore(s => s.loading);
+  const storeError = useUserStore(s => s.error);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setLocalError('');
 
     if (!email || !password) {
-      setError('Please fill in all fields');
+      setLocalError('Please fill in all fields');
       return;
     }
 
     if (!email.includes('@')) {
-      setError('Please enter a valid email address');
+      setLocalError('Please enter a valid email address');
       return;
     }
 
-    const name = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-    signIn(email, name);
-    navigate('/');
+    const success = await signIn(email, password);
+    if (success) {
+      navigate('/');
+    }
   };
+
+  const displayError = localError || storeError;
 
   return (
     <div className="bg-gray-100 min-h-screen flex items-center justify-center px-4">
@@ -41,9 +46,9 @@ export default function SignInPage() {
 
           <h1 className="text-2xl font-bold text-gray-900 mb-6">Sign In</h1>
 
-          {error && (
+          {displayError && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
-              <p className="text-sm text-red-600">{error}</p>
+              <p className="text-sm text-red-600">{displayError}</p>
             </div>
           )}
 
@@ -79,8 +84,8 @@ export default function SignInPage() {
               </p>
             </div>
 
-            <button type="submit" className="btn-cart">
-              Sign In
+            <button type="submit" className="btn-cart" disabled={loading}>
+              {loading ? 'Signing In...' : 'Sign In'}
             </button>
           </form>
 
@@ -101,7 +106,7 @@ export default function SignInPage() {
         </div>
 
         <p className="text-xs text-gray-500 text-center mt-4">
-          Demo: Use any email and password to sign in
+          Demo: demo@scamazon.com / password123
         </p>
       </div>
     </div>

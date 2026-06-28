@@ -50,10 +50,52 @@ export const useUserStore = create(
   persist(
     (set, get) => ({
       user: null,
-      signIn: (email, name) => {
-        set({ user: { email, name } });
+      loading: false,
+      error: null,
+      signIn: async (email, password) => {
+        set({ loading: true, error: null });
+        try {
+          const res = await fetch(`/api/users?email=${encodeURIComponent(email)}`);
+          const users = await res.json();
+          if (users.length === 0) {
+            set({ loading: false, error: 'No account found with this email' });
+            return false;
+          }
+          const user = users[0];
+          if (user.password !== password) {
+            set({ loading: false, error: 'Incorrect password' });
+            return false;
+          }
+          set({ user: { id: user.id, email: user.email, name: user.name }, loading: false });
+          return true;
+        } catch (err) {
+          set({ loading: false, error: 'Failed to connect to server' });
+          return false;
+        }
       },
-      signOut: () => set({ user: null }),
+      register: async (name, email, password) => {
+        set({ loading: true, error: null });
+        try {
+          const res = await fetch(`/api/users?email=${encodeURIComponent(email)}`);
+          const existing = await res.json();
+          if (existing.length > 0) {
+            set({ loading: false, error: 'An account with this email already exists' });
+            return false;
+          }
+          const createRes = await fetch('/api/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password }),
+          });
+          const newUser = await createRes.json();
+          set({ user: { id: newUser.id, email: newUser.email, name: newUser.name }, loading: false });
+          return true;
+        } catch (err) {
+          set({ loading: false, error: 'Failed to connect to server' });
+          return false;
+        }
+      },
+      signOut: () => set({ user: null, error: null }),
       isSignedIn: () => get().user !== null,
     }),
     { name: 'scamazon-user' }

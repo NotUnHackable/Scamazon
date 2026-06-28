@@ -7,37 +7,43 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const signIn = useUserStore(s => s.signIn);
+  const [localError, setLocalError] = useState('');
+  const register = useUserStore(s => s.register);
+  const loading = useUserStore(s => s.loading);
+  const storeError = useUserStore(s => s.error);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setLocalError('');
 
     if (!name || !email || !password || !confirmPassword) {
-      setError('Please fill in all fields');
+      setLocalError('Please fill in all fields');
       return;
     }
 
     if (!email.includes('@')) {
-      setError('Please enter a valid email address');
+      setLocalError('Please enter a valid email address');
       return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setLocalError('Password must be at least 6 characters');
       return;
     }
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setLocalError('Passwords do not match');
       return;
     }
 
-    signIn(email, name);
-    navigate('/');
+    const success = await register(name, email, password);
+    if (success) {
+      navigate('/');
+    }
   };
+
+  const displayError = localError || storeError;
 
   return (
     <div className="bg-gray-100 min-h-screen flex items-center justify-center px-4">
@@ -52,9 +58,9 @@ export default function RegisterPage() {
 
           <h1 className="text-2xl font-bold text-gray-900 mb-6">Create Account</h1>
 
-          {error && (
+          {displayError && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
-              <p className="text-sm text-red-600">{error}</p>
+              <p className="text-sm text-red-600">{displayError}</p>
             </div>
           )}
 
@@ -116,8 +122,8 @@ export default function RegisterPage() {
               />
             </div>
 
-            <button type="submit" className="btn-cart">
-              Create your Scamazon account
+            <button type="submit" className="btn-cart" disabled={loading}>
+              {loading ? 'Creating Account...' : 'Create your Scamazon account'}
             </button>
           </form>
 
